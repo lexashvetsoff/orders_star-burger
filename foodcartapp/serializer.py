@@ -11,7 +11,7 @@ class OrderMenuItemSerializer(ModelSerializer):
 
 
 class FoodcartappSerializer(ModelSerializer):
-    products = OrderMenuItemSerializer(many=True)
+    products = OrderMenuItemSerializer(many=True, write_only=True)
     class Meta:
         model = Order
         fields = ['firstname', 'lastname', 'phonenumber', 'address', 'products']
