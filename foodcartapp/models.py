@@ -168,7 +168,7 @@ class OrderMenuItem(models.Model):
         related_name='order_items',
         verbose_name='продукт',
     )
-    count = models.IntegerField(
+    quantity = models.IntegerField(
         'количество',
         default=1,
         db_index=True
