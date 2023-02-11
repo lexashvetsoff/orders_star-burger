@@ -70,13 +70,55 @@ def register_order(request):
 
     if not 'products' in data:
         content = {
-            'error': '// products: Обязательное поле.',
+            'error': 'products: Обязательное поле.',
+        }
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    
+    if (not 'firstname' in data and
+        not 'lastname' in data and
+        not 'phonenumber' in data and
+        not 'address' in data):
+        content = {
+            'error': 'firstname, lastname, phonenumber, address: Обязательное поле.',
         }
         return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
     if isinstance(data['products'], type(None)):
         content = {
             'error': 'products: Это поле не может быть пустым.',
+        }
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    
+    if (isinstance(data['firstname'], type(None)) and
+        isinstance(data['lastname'], type(None)) and
+        isinstance(data['phonenumber'], type(None)) and
+        isinstance(data['address'], type(None))):
+        content = {
+            'error': 'firstname, lastname, phonenumber, address: Это поле не может быть пустым.',
+        }
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    
+    if isinstance(data['firstname'], type(None)):
+        content = {
+            'error': 'firstname: Это поле не может быть пустым.',
+        }
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    
+    if isinstance(data['lastname'], type(None)):
+        content = {
+            'error': 'lastname: Это поле не может быть пустым.',
+        }
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    
+    if isinstance(data['phonenumber'], type(None)):
+        content = {
+            'error': 'phonenumber: Это поле не может быть пустым.',
+        }
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    
+    if isinstance(data['address'], type(None)):
+        content = {
+            'error': 'address: Это поле не может быть пустым.',
         }
         return Response(content, status=status.HTTP_400_BAD_REQUEST)
     
@@ -88,6 +130,62 @@ def register_order(request):
     elif len(data['products']) == 0:
         content = {
             'error': 'products: Этот список не может быть пустым.',
+        }
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    
+    if not data['firstname']:
+        content = {
+            'error': 'firstname: Это поле не может быть пустым.',
+        }
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    
+    if not data['lastname']:
+        content = {
+            'error': 'lastname: Это поле не может быть пустым.',
+        }
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    
+    if not data['phonenumber']:
+        content = {
+            'error': 'phonenumber: Это поле не может быть пустым.',
+        }
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    
+    if not data['address']:
+        content = {
+            'error': 'address: Это поле не может быть пустым.',
+        }
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    
+    if isinstance(data['firstname'], list):
+        content = {
+            'error': 'В поле firstname положили список.',
+        }
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    
+    if isinstance(data['lastname'], list):
+        content = {
+            'error': 'В поле lastname положили список.',
+        }
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    
+    if isinstance(data['phonenumber'], list):
+        content = {
+            'error': 'В поле phonenumber положили список.',
+        }
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    
+    if isinstance(data['address'], list):
+        content = {
+            'error': 'В поле address положили список.',
+        }
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    
+    for product in data['products']:
+        if not Product.objects.filter(id=product['product']).exists():
+            id = product['product']
+            content = {
+            'error': f'products: Недопустимый первичный ключ "{id}".',
         }
         return Response(content, status=status.HTTP_400_BAD_REQUEST)
     
