@@ -174,6 +174,10 @@ class Order(models.Model):
         db_index=True,
         verbose_name='статус заказа'
     )
+    comment = models.TextField(
+        verbose_name='Комментарий',
+        default=''
+    )
     # objects = OrderQuerySet.as_manager()
     # objects = models.Manager()
     # order_cost = OrderManager()
