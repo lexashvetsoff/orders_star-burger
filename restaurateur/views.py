@@ -100,7 +100,9 @@ def view_orders(request):
         cost_item = item.order_items.all().annotate(order_cost=F('price')*F('quantity'))
         cost = cost_item.aggregate(cost=Sum('order_cost'))
         item.cost = cost['cost']
-        item.change_url = reverse('admin:foodcartapp_order_change', args =(item.id ,))
+        item.change_url = reverse('admin:foodcartapp_order_change', args =(item.id, ))
+    
+    print(request.get_full_path)
     
     return render(request, template_name='order_items.html', context={
         'order_items': order_items,
