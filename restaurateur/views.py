@@ -95,7 +95,7 @@ def view_restaurants(request):
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
 
-    order_items = Order.objects.all()
+    order_items = Order.objects.exclude(status='исполнен').all()
     for item in order_items:
         cost_item = item.order_items.all().annotate(order_cost=F('price')*F('quantity'))
         cost = cost_item.aggregate(cost=Sum('order_cost'))

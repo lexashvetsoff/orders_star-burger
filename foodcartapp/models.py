@@ -144,6 +144,16 @@ class RestaurantMenuItem(models.Model):
 
 
 class Order(models.Model):
+    PROCESSING = 'необработанный'
+    ASSEMLY = 'сборка'
+    DELIVERY = 'доставка'
+    FINISHED = 'исполнен'
+    STATUS_CHOICES = [
+        (PROCESSING, 'необработанный'),
+        (ASSEMLY, 'сборка'),
+        (DELIVERY, 'доставка'),
+        (FINISHED, 'исполнен'),
+    ]
     firstname = models.CharField(
         'Имя',
         max_length=50
@@ -157,13 +167,13 @@ class Order(models.Model):
         'адрес',
         max_length=100,
     )
-    # sum = models.DecimalField(
-    #     'сумма заказа',
-    #     max_digits=8,
-    #     default=0,
-    #     decimal_places=2,
-    #     validators=[MinValueValidator(0)]
-    # )
+    status = models.CharField(
+        max_length=15,
+        choices=STATUS_CHOICES,
+        default=PROCESSING,
+        db_index=True,
+        verbose_name='статус заказа'
+    )
     # objects = OrderQuerySet.as_manager()
     # objects = models.Manager()
     # order_cost = OrderManager()
