@@ -189,11 +189,13 @@ class Order(models.Model):
     )
     called_at = models.DateTimeField(
         verbose_name='Время звонка',
+        db_index=True,
         null=True,
         blank=True
     )
     delivered_at = models.DateTimeField(
         verbose_name='Время доставки',
+        db_index=True,
         null=True,
         blank=True
     )
