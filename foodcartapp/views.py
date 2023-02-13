@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.templatetags.static import static
+from django.db import transaction
 
 from rest_framework.decorators import api_view
 from rest_framework import status
@@ -65,6 +66,7 @@ def product_list_api(request):
     })
 
 
+@transaction.atomic
 @api_view(['POST'])
 def register_order(request):
     data = request.data
@@ -73,26 +75,27 @@ def register_order(request):
     serializer.is_valid(raise_exception=True)
     
     # order_sum = 0
-    order = Order.objects.create(
-        firstname = serializer.validated_data['firstname'],
-        lastname = serializer.validated_data['lastname'],
-        phonenumber = serializer.validated_data['phonenumber'],
-        address = serializer.validated_data['address'],
-    )
-
-    for product in serializer.validated_data['products']:
-        order_product = Product.objects.get(id=product['product'].id)
-        # sum = order_product.price * product['quantity']
-        # order_sum += sum
-
-        OrderMenuItem.objects.create(
-            order = order,
-            product = order_product,
-            price = order_product.price,
-            quantity = product['quantity'],
+    with transaction.atomic():
+        order = Order.objects.create(
+            firstname = serializer.validated_data['firstname'],
+            lastname = serializer.validated_data['lastname'],
+            phonenumber = serializer.validated_data['phonenumber'],
+            address = serializer.validated_data['address'],
         )
-    # order.sum = order_sum
-    order.save()
+
+        for product in serializer.validated_data['products']:
+            order_product = Product.objects.get(id=product['product'].id)
+            # sum = order_product.price * product['quantity']
+            # order_sum += sum
+
+            OrderMenuItem.objects.create(
+                order = order,
+                product = order_product,
+                price = order_product.price,
+                quantity = product['quantity'],
+            )
+        # order.sum = order_sum
+        order.save()
     content = JSONRenderer().render(serializer.data)
     print(content)
     # return JsonResponse({content}, safe=False)
