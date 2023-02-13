@@ -7,8 +7,10 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 
+from django.db.models import F, Sum
 
-from foodcartapp.models import Product, Restaurant
+
+from foodcartapp.models import Product, Restaurant, Order
 
 
 class Login(forms.Form):
@@ -92,6 +94,20 @@ def view_restaurants(request):
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
+    # order_items = Order.order_cost.all().cost()
+    # items = order_items.cost()
+    # r = order_items[29].order_items.all().annotate(order_cost=F('product__price')*F('quantity'))
+    # f = r.aggregate(cost=Sum('order_cost'))
+    # print(f['cost'])
+    # print(order_items[29].order_cost().cost())
+
+    order_items = Order.objects.all()
+    for item in order_items:
+        cost_item = item.order_items.all().annotate(order_cost=F('product__price')*F('quantity'))
+        cost = cost_item.aggregate(cost=Sum('order_cost'))
+        item.cost = cost['cost']
+
+    # print(order_items[29].cost)
     return render(request, template_name='order_items.html', context={
-        # TODO заглушка для нереализованного функционала
+        'order_items': order_items,
     })

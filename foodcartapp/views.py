@@ -72,7 +72,7 @@ def register_order(request):
     serializer = FoodcartappSerializer(data=data)
     serializer.is_valid(raise_exception=True)
     
-    order_sum = 0
+    # order_sum = 0
     order = Order.objects.create(
         firstname = serializer.validated_data['firstname'],
         lastname = serializer.validated_data['lastname'],
@@ -82,8 +82,8 @@ def register_order(request):
 
     for product in serializer.validated_data['products']:
         order_product = Product.objects.get(id=product['product'].id)
-        sum = order_product.price * product['quantity']
-        order_sum += sum
+        # sum = order_product.price * product['quantity']
+        # order_sum += sum
 
         OrderMenuItem.objects.create(
             order = order,
@@ -91,7 +91,7 @@ def register_order(request):
             quantity = product['quantity'],
             sum = sum,
         )
-    order.sum = order_sum
+    # order.sum = order_sum
     order.save()
     content = JSONRenderer().render(serializer.data)
     print(content)

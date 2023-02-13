@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import F, Sum
 from django.core.validators import MinValueValidator
 # from phonenumber_field.modelfields import PhoneNumberField
 from phonenumber_field.modelfields import PhoneNumberField
@@ -125,6 +126,23 @@ class RestaurantMenuItem(models.Model):
         return f"{self.restaurant.name} - {self.product.name}"
 
 
+# class OrderQuerySet(models.QuerySet):
+#     def cost(self):
+#         # cost_item = self.order_items.all().annotate(order_cost=F('product__price')*F('quantity'))
+#         # cost_item = self.annotate(order_cost=F('order_items__product__price')*F('order_items__quantity'))
+#         cost = self.aggregate(cost=Sum(self.annotate(order_cost=F('order_items__product__price')*F('order_items__quantity'))))
+#         return cost['cost']
+#         # return cost_item.aggregate(cost=Sum('order_cost'))
+
+
+# class OrderManager(models.Manager):
+#     def get_queryset(self):
+#         return OrderQuerySet(self.model)
+    
+#     def cost(self):
+#         return self.get_queryset().cost()
+
+
 class Order(models.Model):
     firstname = models.CharField(
         'Имя',
@@ -139,13 +157,17 @@ class Order(models.Model):
         'адрес',
         max_length=100,
     )
-    sum = models.DecimalField(
-        'сумма заказа',
-        max_digits=8,
-        default=0,
-        decimal_places=2,
-        validators=[MinValueValidator(0)]
-    )
+    # sum = models.DecimalField(
+    #     'сумма заказа',
+    #     max_digits=8,
+    #     default=0,
+    #     decimal_places=2,
+    #     validators=[MinValueValidator(0)]
+    # )
+    # objects = OrderQuerySet.as_manager()
+    # objects = models.Manager()
+    # order_cost = OrderManager()
+    # order_cost = OrderQuerySet.as_manager()
 
     class Meta:
         verbose_name = 'заказ'
@@ -168,18 +190,19 @@ class OrderMenuItem(models.Model):
         related_name='order_items',
         verbose_name='продукт',
     )
+    # price = models.DecimalField(
+    #     'цена',
+    #     validators=[MinValueValidator(0)],
+    #     max_digits=8,
+    #     default=0,
+    #     decimal_places=2,
+    # )
     quantity = models.IntegerField(
         'количество',
         default=1,
         db_index=True
     )
-    sum = models.DecimalField(
-        'сумма',
-        max_digits=8,
-        default=0,
-        decimal_places=2,
-        validators=[MinValueValidator(0)]
-    )
+    
 
     class Meta:
         verbose_name = 'пункт заказа'
