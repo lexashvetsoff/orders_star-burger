@@ -146,6 +146,13 @@ class RestaurantMenuItem(models.Model):
 
 
 class Order(models.Model):
+    CASH = 'наличностью'
+    ELECTRON = 'электронно'
+    PAYMENT_CHOICES = [
+        (CASH, 'наличностью'),
+        (ELECTRON, 'электронно'),
+    ]
+
     PROCESSING = 'необработанный'
     ASSEMLY = 'сборка'
     DELIVERY = 'доставка'
@@ -156,6 +163,7 @@ class Order(models.Model):
         (DELIVERY, 'доставка'),
         (FINISHED, 'исполнен'),
     ]
+
     firstname = models.CharField(
         'Имя',
         max_length=50
@@ -175,6 +183,13 @@ class Order(models.Model):
         default=PROCESSING,
         db_index=True,
         verbose_name='статус заказа'
+    )
+    payment_method = models.CharField(
+        max_length=12,
+        choices=PAYMENT_CHOICES,
+        default=CASH,
+        db_index=True,
+        verbose_name='Способ оплаты'
     )
     comment = models.TextField(
         verbose_name='Комментарий',
