@@ -190,13 +190,13 @@ class OrderMenuItem(models.Model):
         related_name='order_items',
         verbose_name='продукт',
     )
-    # price = models.DecimalField(
-    #     'цена',
-    #     validators=[MinValueValidator(0)],
-    #     max_digits=8,
-    #     default=0,
-    #     decimal_places=2,
-    # )
+    price = models.DecimalField(
+        'цена',
+        validators=[MinValueValidator(0)],
+        max_digits=8,
+        default=0,
+        decimal_places=2,
+    )
     quantity = models.IntegerField(
         'количество',
         default=1,

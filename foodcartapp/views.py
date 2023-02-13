@@ -88,8 +88,8 @@ def register_order(request):
         OrderMenuItem.objects.create(
             order = order,
             product = order_product,
+            price = order_product.price,
             quantity = product['quantity'],
-            sum = sum,
         )
     # order.sum = order_sum
     order.save()
