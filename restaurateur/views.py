@@ -1,7 +1,7 @@
 from django import forms
 from django.shortcuts import redirect, render
 from django.views import View
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.contrib.auth.decorators import user_passes_test
 
 from django.contrib.auth import authenticate, login
@@ -100,6 +100,7 @@ def view_orders(request):
         cost_item = item.order_items.all().annotate(order_cost=F('price')*F('quantity'))
         cost = cost_item.aggregate(cost=Sum('order_cost'))
         item.cost = cost['cost']
+        item.change_url = reverse('admin:foodcartapp_order_change', args =(item.id ,))
     
     return render(request, template_name='order_items.html', context={
         'order_items': order_items,
