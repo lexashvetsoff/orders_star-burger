@@ -4,6 +4,8 @@ from django.core.validators import MinValueValidator
 # from phonenumber_field.modelfields import PhoneNumberField
 from phonenumber_field.modelfields import PhoneNumberField
 
+import datetime
+
 
 class Restaurant(models.Model):
     name = models.CharField(
@@ -176,7 +178,24 @@ class Order(models.Model):
     )
     comment = models.TextField(
         verbose_name='Комментарий',
-        default=''
+        default='',
+        null=True,
+        blank=True
+    )
+    regisred_at = models.DateTimeField(
+        verbose_name='Время регистрации',
+        db_index=True,
+        default=datetime.datetime.now
+    )
+    called_at = models.DateTimeField(
+        verbose_name='Время звонка',
+        null=True,
+        blank=True
+    )
+    delivered_at = models.DateTimeField(
+        verbose_name='Время доставки',
+        null=True,
+        blank=True
     )
     # objects = OrderQuerySet.as_manager()
     # objects = models.Manager()
