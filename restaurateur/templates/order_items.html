@@ -21,6 +21,7 @@
       <th>Телефон</th>
       <th>Адрес доставки</th>
       <th>Комментарий</th>
+      <th>Рестораны</th>
       <th>Ссылка на админку</th>
     </tr>
 
@@ -34,6 +35,18 @@
         <td>{{item.phonenumber}}</td>
         <td>{{item.address}}</td>
         <td>{{item.comment}}</td>
+        <td>
+          {% if not item.restaurant %}
+            <details>
+              <summary>может быть приготовлен:</summary>
+              {% for restaurant in item.all_restaurants %}
+                {{restaurant.name}}
+              {% endfor %}
+            </details>
+          {% else %}
+            {{item.restaurant}}
+          {% endif %}
+        </td>
         <input type="hidden" name="next" value="{{ request.GET.next }}"/>
         <td><a href="{{item.change_url}}?next={{ request.get_full_path|urlencode }}">Редактировать</a></td>
       </tr>

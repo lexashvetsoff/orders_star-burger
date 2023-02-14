@@ -191,6 +191,14 @@ class Order(models.Model):
         db_index=True,
         verbose_name='Способ оплаты'
     )
+    restaurant = models.ForeignKey(
+        Restaurant,
+        related_name='restauran_orders',
+        verbose_name="ресторан",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
     comment = models.TextField(
         verbose_name='Комментарий',
         default='',
@@ -222,6 +230,11 @@ class Order(models.Model):
     class Meta:
         verbose_name = 'заказ'
         verbose_name_plural = 'заказы'
+    
+    def save(self, *args, **kwargs):
+        if self.restaurant:
+            self.status = self.ASSEMLY
+        super(Order, self).save()
 
     def __str__(self):
         return f'Заказ {self.id} - для {self.phonenumber}'

@@ -10,7 +10,7 @@ from django.contrib.auth import views as auth_views
 from django.db.models import F, Sum
 
 
-from foodcartapp.models import Product, Restaurant, Order
+from foodcartapp.models import Product, Restaurant, Order, RestaurantMenuItem
 
 
 class Login(forms.Form):
@@ -92,6 +92,29 @@ def view_restaurants(request):
     })
 
 
+def get_restaurants(query_set):
+    restaurants = []
+    order_items = query_set.order_items.all()
+    if len(order_items) == 0:
+        return restaurants
+    elif len(order_items) == 1:
+        for order_item in order_items:
+            menu_items = order_item.product.menu_items.all()
+            for menu_item in menu_items:
+                restaurants.append(menu_item.restaurant)
+        return restaurants
+    else:
+        for order_item in order_items:
+            all_restaurants = []
+            temp_restaurants = []
+            menu_items = order_item.product.menu_items.all()
+            for menu_item in menu_items:
+                temp_restaurants.append(menu_item.restaurant)
+            all_restaurants.append(temp_restaurants)
+            restaurants = list(set.intersection(*map(set, all_restaurants)))
+        return restaurants
+
+
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
 
@@ -101,8 +124,11 @@ def view_orders(request):
         cost = cost_item.aggregate(cost=Sum('order_cost'))
         item.cost = cost['cost']
         item.change_url = reverse('admin:foodcartapp_order_change', args =(item.id, ))
+        if not item.restaurant:
+            item.all_restaurants = get_restaurants(item)
+        print(item.restaurant)
     
-    print(request.get_full_path)
+    # print(order_items[35].order_items.all()[0].product.menu_items.all()[0].restaurant)
     
     return render(request, template_name='order_items.html', context={
         'order_items': order_items,
