@@ -9,8 +9,11 @@ from django.contrib.auth import views as auth_views
 
 from django.db.models import F, Sum
 
+import requests
+from geopy import distance
 
 from foodcartapp.models import Product, Restaurant, Order, RestaurantMenuItem
+from star_burger.settings import YANDEX_MAP_API
 
 
 class Login(forms.Form):
@@ -115,9 +118,28 @@ def get_restaurants(query_set):
         return restaurants
 
 
+def fetch_coordinates(apikey, address):
+    base_url = "https://geocode-maps.yandex.ru/1.x"
+    response = requests.get(base_url, params={
+        "geocode": address,
+        "apikey": apikey,
+        "format": "json",
+    })
+    response.raise_for_status()
+    found_places = response.json()['response']['GeoObjectCollection']['featureMember']
+
+    if not found_places:
+        return None
+
+    most_relevant = found_places[0]
+    lon, lat = most_relevant['GeoObject']['Point']['pos'].split(" ")
+    # return lon, lat
+    return lat, lon
+
+
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-
+    restaurants_distance = {}
     order_items = Order.objects.exclude(status='исполнен').all()
     for item in order_items:
         cost_item = item.order_items.all().annotate(order_cost=F('price')*F('quantity'))
@@ -126,10 +148,33 @@ def view_orders(request):
         item.change_url = reverse('admin:foodcartapp_order_change', args =(item.id, ))
         if not item.restaurant:
             item.all_restaurants = get_restaurants(item)
-        print(item.restaurant)
-    
-    # print(order_items[35].order_items.all()[0].product.menu_items.all()[0].restaurant)
+            item_distances = []
+            for restaurant in item.all_restaurants:
+                # print(restaurant)
+                # try:
+                #     client_coord = fetch_coordinates(YANDEX_MAP_API, item.address)
+                #     restaurant_coord = fetch_coordinates(YANDEX_MAP_API, restaurant.address)
+                #     item_distances.append({restaurant.name: distance.distance(client_coord, restaurant_coord).km})
+                # except:
+                #     item_distances.append({restaurant.name: 'Не удалость расчитать растояние'})
+                item_distances.append({restaurant.name: restaurant.address})
+            restaurants_distance[item.id] = item_distances
+        # else:
+        #     try:
+        #         client_coord = fetch_coordinates(YANDEX_MAP_API, item.address)
+        #         restaurant_coord = fetch_coordinates(YANDEX_MAP_API, item.restaurant.address)
+        #         distance_km = distance.distance(client_coord, restaurant_coord).km
+        #     except:
+        #         print('Не удалость расчитать растояние')
+            
+    # print(restaurants_distance[29])
+    # for item in restaurants_distance:
+    #     print(type(item))
+    #     # for temp_item in restaurants_distance[item]:
+    #     #     for i, y in temp_item.items():
+    #     #         print(i, y)
     
     return render(request, template_name='order_items.html', context={
         'order_items': order_items,
+        'restaurants_distance': restaurants_distance,
     })

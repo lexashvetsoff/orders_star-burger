@@ -39,8 +39,10 @@
           {% if not item.restaurant %}
             <details>
               <summary>может быть приготовлен:</summary>
-              {% for restaurant in item.all_restaurants %}
-                {{restaurant.name}}
+              {% for restaurants in restaurants_distance[item.id] %}
+                {% for rest, dist in restaurants.items() %}
+                  {{rest}}: {{dist}}
+                {% endfor %}
               {% endfor %}
             </details>
           {% else %}
